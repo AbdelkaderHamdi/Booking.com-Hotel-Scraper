@@ -4,7 +4,7 @@ import csv
 import logging
 import argparse
 from dataclasses import dataclass
-from typing import List, Optional
+
 
 
 
@@ -20,12 +20,9 @@ class Hotel:
 class BookingHotelScraper:
     """Professional web scraper for Booking.com hotel data"""
     
-    def __init__(self, delay: float = 1.0):
+    def __init__(self, delay = 1.0):
         """
         Initialize the scraper with configuration
-        
-        Args:
-            delay: Delay between requests in seconds (be respectful to the server)
         """
         self.delay = delay
         self.session = requests.Session()
@@ -38,18 +35,11 @@ class BookingHotelScraper:
             'Upgrade-Insecure-Requests': '1',
         })
           
-    def fetch_page(self, url: str) -> Optional[BeautifulSoup]:
+    def fetch_page(self, url):
         """
         Fetch and parse a web page with error handling
-        
-        Args:
-            url: URL to fetch
-            
-        Returns:
-            BeautifulSoup object or None if failed
         """
-        
-            
+ 
         try:
             logging.info(f"Fetching: {url}")
             response = self.session.get(url, timeout=10)
@@ -66,15 +56,9 @@ class BookingHotelScraper:
             logging.error(f"Unexpected error: {e}")
             return None
     
-    def extract_hotel_data(self, hotel_div) -> Optional[Hotel]:
+    def extract_hotel_data(self, hotel_div):
         """
         Extract hotel information from a hotel div element
-        
-        Args:
-            hotel_div: BeautifulSoup div element containing hotel data
-            
-        Returns:
-            Hotel object or None if extraction failed
         """
         try:
             # Extract hotel name
@@ -105,21 +89,14 @@ class BookingHotelScraper:
                 price=price
             )
                 
-            
-            
+   
         except Exception as e:
             logging.warning(f"Failed to extract hotel data: {e}")
             return None
-    
-    def scrape_hotels(self, url: str) -> List[Hotel]:
+
+    def scrape_hotels(self, url):
         """
         Scrape hotel data from a Booking.com search results page
-        
-        Args:
-            url: Booking.com search results URL
-            
-        Returns:
-            List of Hotel objects
         """
         soup = self.fetch_page(url)
         if not soup:
@@ -141,24 +118,15 @@ class BookingHotelScraper:
         logging.info(f"Successfully extracted {len(hotels)} hotels")
         return hotels
     
-    def save_to_csv(self, hotels: List[Hotel], filename: str = None) -> str:
+    def save_to_csv(self, hotels, filename):
         """
         Save hotel data to CSV file
-        
-        Args:
-            hotels: List of Hotel objects
-            filename: Output filename (optional)
-            
-        Returns:
-            Filename of the saved file
         """
         if not filename:    
             filename = "booking_hotels.csv"
-        
-       
-        
+   
         try:
-            with open(filename, 'w', newline='', encoding='utf-8') as file:
+            with open(filename, 'a', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
                 
                 # Write header
@@ -188,7 +156,7 @@ def main():
     parser.add_argument('url', help='Booking.com search results URL')
     parser.add_argument('--delay', type=float, default=1.0, help='Delay between requests (seconds)')
     parser.add_argument('--output', help='Output filename (without extension)')
-    parser.add_argument('--format', choices=['csv', 'json', 'both'], default='csv', help='Output format')
+    parser.add_argument('--format', choices=['csv', 'json'], default='csv', help='Output format')
     
     args = parser.parse_args()
     
@@ -204,9 +172,12 @@ def main():
             return
         
         # Save data
-        if args.format in ['csv', 'both']:
+        if args.format == 'csv':
             csv_file = scraper.save_to_csv(hotels, args.output and f"{args.output}.csv")
             print(f"CSV data saved to: {csv_file}")
+        if args.format == 'json':
+            json_file = scraper.save_to_json(hotels, args.output and f"{args.output}.json")
+            print(f"JSON data saved to: {json_file}")
         
         
         print(f"Successfully scraped {len(hotels)} hotels!")
@@ -216,9 +187,10 @@ def main():
         logging.error(f"Scraping failed: {e}")
         raise
 
+
 if __name__ == "__main__":
  
-    url = 'https://www.booking.com/searchresults.en-gb.html?ss=Sousse&ssne=Sousse&ssne_untouched=Sousse&efdco=1&label=gog235jc-1DCAEoggI46AdIM1gDaOIBiAEBmAEJuAEYyAEM2AED6AEBiAIBqAIEuAK50orDBsACAdICJGZhODNhNDgxLTNkNTgtNDE2ZC1hNjE3LTkyYmNlNzNiOTlkNdgCBOACAQ&sid=6e05bb8ca7bc59b5c054b280068b16e9&aid=397594&lang=en-gb&sb=1&src_elem=sb&src=searchresults&dest_id=-731250&dest_type=city&checkin=2025-07-01&checkout=2025-07-02&group_adults=2&no_rooms=1&group_children=0'
+    url ="https://www.booking.com/searchresults.en-gb.html?ss=Paris"
     
     scraper = BookingHotelScraper()
     hotels = scraper.scrape_hotels(url)
