@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import json
 import logging
 import argparse
 from dataclasses import dataclass
@@ -118,7 +119,7 @@ class BookingHotelScraper:
         logging.info(f"Successfully extracted {len(hotels)} hotels")
         return hotels
     
-    def save_to_csv(self, hotels, filename):
+    def save_to_csv(self, hotels, filename=None):
         """
         Save hotel data to CSV file
         """
@@ -147,6 +148,35 @@ class BookingHotelScraper:
             
         except Exception as e:
             logging.error(f"Failed to save CSV: {e}")
+            raise
+
+    def save_to_json(self, hotels, filename=None):
+        """
+        Save hotel data to JSON file
+        """
+        if not filename:    
+            filename = "booking_hotels.json"
+
+        # Préparer les données
+        hotels_data = []
+        for hotel in hotels:
+            hotels_data.append({
+                "Hotel Name": hotel.name,
+                "Location": hotel.location,
+                "Review Score": hotel.review_score,
+                "Number of Reviews": hotel.review_count,
+                "Price": hotel.price
+            })
+   
+        try:
+            with open(filename, 'w', newline='', encoding='utf-8') as file:
+                json.dump(hotels_data, file, ensure_ascii=False, indent=4)
+ 
+            logging.info(f"Data saved to {filename}")
+            return filename
+            
+        except Exception as e:
+            logging.error(f"Failed to save JSON: {e}")
             raise
 
 
