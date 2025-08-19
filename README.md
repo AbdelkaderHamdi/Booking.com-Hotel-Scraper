@@ -50,7 +50,7 @@ scraper.save_to_csv(hotels)
 
 ```bash
 # Basic scraping
-python main.py "https://www.booking.com/searchresults.en-gb.html?ss=Sousse..."
+python hotel_scraper.py "https://www.booking.com/searchresults.html?...paris..." --delay 2 --output paris_hotels --format both
 
 # Custom output filename
 python main.py "URL_HERE" --output "sousse_hotels"
