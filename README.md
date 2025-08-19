@@ -22,7 +22,7 @@ lxml>=4.9.0
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/booking-hotel-scraper.git
+git clone https://github.com/AbdelkaderHamdi/Booking.com-Hotel-Scraper.git
 cd booking-hotel-scraper
 ```
 
